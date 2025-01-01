@@ -24,7 +24,7 @@ SERVER_PORT = None
 # Function to handle incoming requests from peers
 def handle_peer_connection(client_socket, client_address):
     try:
-        request = client_socket.recv(BUFFER_SIZE).decode()
+        request = client_socket.recv(BUFFER_SIZE).decode('utf-8')
 
         if request.startswith("GET "):  # File request
             filename = request.split()[1]
@@ -50,7 +50,7 @@ def start_server(gui_update_network_details):
     SERVER_IP = socket.gethostbyname(socket.gethostname())  # Get the local IP address
     SERVER_PORT = server_socket.getsockname()[1]  # Retrieve the assigned port
     gui_update_network_details(SERVER_IP, SERVER_PORT)  # Update GUI with the assigned IP and port
-    server_socket.listen(5)
+    server_socket.listen(10)
 
     while True:
         client_socket, client_address = server_socket.accept()
@@ -61,9 +61,9 @@ def request_file(peer_host, peer_port, filename, gui_log):
     try:
         peer_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         peer_socket.connect((peer_host, peer_port))
-        peer_socket.send(f"GET {filename}".encode())
+        peer_socket.send(f"GET {filename}".encode('utf-8'))
 
-        response = peer_socket.recv(BUFFER_SIZE).decode()
+        response = peer_socket.recv(BUFFER_SIZE).decode('utf-8')
         if response == "OK":
             download_path = os.path.join(DOWNLOADS_FOLDER, filename)
             with open(download_path, "wb") as file:
